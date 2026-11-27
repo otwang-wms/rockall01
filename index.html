@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>《大地時光機：搶救「變動大地」核心》｜國小六年級自然互動解謎</title>
+  <style>
+    :root {
+      --bg-main: #f0f6fa;
+      --card-bg: #ffffff;
+      --primary: #1e6b7b;
+      --primary-dark: #134b57;
+      --accent: #f59e0b;
+      --accent-dark: #d97706;
+      --success: #10b981;
+      --danger: #ef4444;
+      --earth: #8b5a2b;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(160deg, #e0f2fe 0%, #fef3c7 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 頂部狀態列 Top HUD */
+    header.top-hud {
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .hud-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .hud-brand span.badge-grade {
+      background: var(--accent);
+      color: #0f172a;
+      font-size: 0.78rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+
+    .hud-progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 420px;
+      min-width: 220px;
+    }
+
+    .energy-bar-outer {
+      flex: 1;
+      height: 14px;
+      background: #334155;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #475569;
+    }
+
+    .energy-bar-inner {
+      height: 100%;
+      width: 15%;
+      background: linear-gradient(90deg, #38bdf8, #10b981, #f59e0b);
+      transition: width 0.5s ease;
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button.hud-btn {
+      min-height: 48px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    button.hud-btn:hover {
+      background: #334155;
+    }
+
+    button.hud-btn.map-btn {
+      background: var(--primary);
+      border-color: #38bdf8;
+    }
+
+    /* 主舞台 Main Stage */
+    main.main-stage {
+      flex: 1;
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 18px 16px 135px;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 大廳地圖 Hub */
+    .story-banner {
+      background: linear-gradient(135deg, #134b57 0%, #1e3a8a 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .story-banner h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.45rem;
+    }
+
+    .story-banner p {
+      margin: 0;
+      line-height: 1.6;
+      color: #e2e8f0;
+      font-size: 0.96rem;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .stage-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 3px solid transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .stage-card:hover {
+      transform: translateY(-3px);
+      border-color: #38bdf8;
+    }
+
+    .stage-card.done {
+      border-color: var(--success);
+      background: linear-gradient(180deg, #ffffff 0%, #ecfdf5 100%);
+    }
+
+    .stage-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #0369a1;
+      width: fit-content;
+      margin-bottom: 10px;
+    }
+
+    .stage-card.done .stage-tag {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .stage-card h2 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+    }
+
+    .stage-card p {
+      margin: 0 0 14px 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .source-ref {
+      font-size: 0.78rem;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+    }
+
+    .btn-primary {
+      min-height: 50px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-dark);
+      color: #fff;
+    }
+
+    /* 最終時光門解鎖橫幅 */
+    .final-gate-box {
+      background: #1e293b;
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 22px;
+      text-align: center;
+      border: 3px dashed #64748b;
+      box-shadow: var(--shadow);
+    }
+
+    .final-gate-box.unlocked {
+      background: linear-gradient(135deg, #4338ca 0%, #0f766e 100%);
+      border: 3px solid #fbbf24;
+    }
+
+    .final-gate-box h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.3rem;
+    }
+
+    /* 關卡內通用元件 */
+    .scene-header {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-left: 6px solid var(--primary);
+    }
+
+    .scene-header h2 {
+      margin: 0 0 4px 0;
+      font-size: 1.25rem;
+    }
+
+    .scene-header .task-desc {
+      margin: 0;
+      color: #0f766e;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .panel-box {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0f172a;
+    }
+
+    /* 拖曳與點選雙模卡池 */
+    .mode-tip {
+      font-size: 0.85rem;
+      color: #0369a1;
+      background: #e0f2fe;
+      padding: 6px 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px;
+      background: #f8fafc;
+      border: 2px dashed #94a3b8;
+      border-radius: 12px;
+      min-height: 68px;
+    }
+
+    .drag-card {
+      min-height: 48px;
+      padding: 10px 14px;
+      background: #fff;
+      border: 2px solid #0284c7;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.93rem;
+      cursor: grab;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+      transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+
+    .drag-card:hover {
+      background: #f0f9ff;
+    }
+
+    .drag-card.selected {
+      background: #fef08a;
+      border-color: #ca8a04;
+      transform: scale(1.05);
+      box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.3);
+    }
+
+    .drop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+
+    .drop-zone {
+      min-height: 96px;
+      background: #f1f5f9;
+      border: 2px dashed #64748b;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .drop-zone.dragover {
+      background: #dbeafe;
+      border-color: #2563eb;
+      transform: scale(1.01);
+    }
+
+    .drop-zone.hint-glow {
+      border-color: var(--danger);
+      background: #fef2f2;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+    }
+
+    .zone-label {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .zone-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 44px;
+    }
+
+    /* 曲流放大鏡視覺區 */
+    .meander-visual {
+      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 2px solid #86efac;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .meander-svg-wrap {
+      flex: 1;
+      min-width: 260px;
+      text-align: center;
+    }
+
+    .meander-info {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    /* 礦物刻劃實驗台 */
+    .scratch-bench {
+      background: #fffbeb;
+      border: 2px solid #fcd34d;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .mineral-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mineral-sample {
+      width: 92px;
+      height: 76px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: 2px solid #94a3b8;
+      position: relative;
+      transition: transform 0.3s;
+    }
+
+    .mineral-quartz {
+      background: linear-gradient(135deg, #ffffff, #e2e8f0);
+    }
+
+    .mineral-talc {
+      background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+    }
+
+    .scratch-mark {
+      display: none;
+      width: 52px;
+      height: 5px;
+      background: #475569;
+      border-radius: 4px;
+      margin-top: 6px;
+      box-shadow: 0 1px 0 #fff;
+    }
+
+    .scratch-mark.show {
+      display: block;
+    }
+
+    @keyframes rubAnim {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(18px) rotate(6deg); }
+      50% { transform: translateX(-10px) rotate(-4deg); }
+      75% { transform: translateX(15px) rotate(5deg); }
+    }
+
+    .rubbing {
+      animation: rubAnim 0.6s ease-in-out 2;
+    }
+
+    /* 選擇題按鈕群 */
+    .choice-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      min-height: 48px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .choice-btn.active {
+      background: #dbeafe;
+      border-color: #2563eb;
+      color: #1e40af;
+    }
+
+    /* 配對連線區 */
+    .match-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .match-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .match-item {
+      min-height: 52px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .match-item.selected {
+      border-color: #f59e0b;
+      background: #fef3c7;
+    }
+
+    .match-tag {
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #0284c7;
+      color: #fff;
+    }
+
+    /* 密碼轉盤鎖 */
+    .dial-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin: 18px 0;
+    }
+
+    .dial-unit {
+      background: #0f172a;
+      color: #fbbf24;
+      padding: 12px 16px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 88px;
+      border: 2px solid #475569;
+    }
+
+    .dial-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      border: none;
+      background: #334155;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .dial-num {
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: monospace;
+    }
+
+    /* 底部道具匣與岩寶對話框 Bottom Dock */
+    footer.bottom-dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.96);
+      color: #fff;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 95;
+      border-top: 3px solid var(--accent);
+    }
+
+    .inventory-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gear-slot {
+      min-height: 44px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: #1e293b;
+      border: 1px dashed #64748b;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gear-slot.obtained {
+      background: #fef3c7;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+    }
+
+    .yanbao-bar {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #1e293b;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    .yanbao-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .yanbao-text {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #f8fafc;
+    }
+
+    /* 彈窗 Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 200;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 20px;
+      max-width: 580px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .modal-card h3 {
+      margin: 0 0 12px 0;
+      font-size: 1.35rem;
+      color: var(--primary-dark);
+    }
+
+    /* 通關學習成就卡 */
+    .recap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .recap-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      border-top: 6px solid var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .teacher-guide {
+      background: #fffbeb;
+      border: 2px solid #fde68a;
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 680px) {
+      .match-container {
+        grid-template-columns: 1fr;
+      }
+      main.main-stage {
+        padding-bottom: 185px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部狀態列 Top HUD -->
+  <header class="top-hud">
+    <div class="hud-brand">
+      <span>⏳ 大地時光機</span>
+      <span class="badge-grade">小六自然｜單元3 變動的大地</span>
+    </div>
+
+    <div class="hud-progress-wrap">
+      <span id="hudProgressText" style="font-size:0.88rem; font-weight:700; white-space:nowrap;">已修復 0 / 3 節點</span>
+      <div class="energy-bar-outer" title="時光機穩定度能量條">
+        <div class="energy-bar-inner" id="energyBar"></div>
+      </div>
+    </div>
+
+    <div class="hud-controls">
+      <button class="hud-btn map-btn" onclick="goHub()">🗺️ 關卡地圖</button>
+      <button class="hud-btn" onclick="openNoteModal()">💡 探險筆記</button>
+      <button class="hud-btn" id="soundToggleBtn" onclick="toggleSound()">🔊 音效：開</button>
+      <button class="hud-btn" onclick="resetGame()" title="重置所有進度">🔄 重置</button>
+    </div>
+  </header>
+
+  <!-- 中央互動主畫面 Main Stage -->
+  <main class="main-stage">
+
+    <!-- ==================== 關卡選擇大廳 (非線性自由選關) ==================== -->
+    <section id="screen-hub" class="screen active">
+      <div class="story-banner">
+        <div style="flex:1; min-width:260px;">
+          <h1>🚨 緊急任務：搶救「變動大地」時光機核心！</h1>
+          <p>
+            地質探險隊的「大地時光機」在勘查臺灣地形與地層時遭到混亂磁場干擾，河流流速錯亂、地底岩石與礦物標籤散落，連遠古化石地層也出現斷層！<br>
+            <strong>你可以自由選擇下方任一區域開始修復（不限先後順序）</strong>，集齊全部 <strong>3 枚時光齒輪密碼</strong>後，才能解鎖中央「大地時光門」安全返航！
+          </p>
+        </div>
+      </div>
+
+      <div class="hub-grid">
+        <!-- 關卡 1 -->
+        <div class="stage-card" id="hub-card-1">
+          <div>
+            <div class="stage-tag" id="hub-tag-1">🌊 區域節點 A｜未完成</div>
+            <h2>關卡一：奔騰河谷與海岸防災站</h2>
+            <p>校準河流上、中、下游堆積物與水流特徵，判讀曲流「凹岸／凸岸」水流變化，並區分海蝕與海積地形！</p>
+            <div class="source-ref">📖 教材依據：課本 P.72～81、98～99 ／ 習作 P.28～31</div>
+          </div>
+          <button class="btn-primary" onclick="openStage(1)">進入河谷與海岸站 ➡️</button>
+        </div>
+
+        <!-- 關卡 2 -->
+        <div class="stage-card" id="hub-card-2">
+          <div>
+            <div class="stage-tag" id="hub-tag-2">💎 區域節點 B｜未完成</div>
+            <h2>關卡二：地底岩層與礦物實驗室</h2>
+            <p>分辨「岩石」與「礦物」標本，親手操作「石英 vs. 滑石」互相刻劃硬度測試，並配對生活中的岩石礦物製品！</p>
+            <div class="source-ref">📖 教材依據：課本 P.84～91、99 ／ 習作 P.32～34</div>
+          </div>
+          <button class="btn-primary" onclick="openStage(2)">進入礦物實驗室 ➡️</button>
+        </div>
+
+        <!-- 關卡 3 -->
+        <div class="stage-card" id="hub-card-3">
+          <div>
+            <div class="stage-tag" id="hub-tag-3">🦕 區域節點 C｜未完成</div>
+            <h2>關卡三：風化土壤與遠古化石區</h2>
+            <p>調配「風化碎屑＋腐化生物遺體」的土壤配方鍋，並解開苗栗過港山壁上「海相扇貝化石」的古環境祕密！</p>
+            <div class="source-ref">📖 教材依據：課本 P.92～97、99 ／ 習作 P.35～39</div>
+          </div>
+          <button class="btn-primary" onclick="openStage(3)">進入遠古化石區 ➡️</button>
+        </div>
+      </div>
+
+      <!-- 最終破關鎖定區 (嚴格檢查全關卡完成) -->
+      <div class="final-gate-box" id="finalGateHubBox">
+        <h3 id="finalGateTitle">🔒 最終破關挑戰：大地時光門（鎖定中）</h3>
+        <p id="finalGateStatusText" style="margin:0 0 14px 0; color:#cbd5e1;">
+          目前尚有 <strong>3 關未完成</strong>！請先完成上方全部 3 個獨立關卡收集時光齒輪，才能開啟終極時光門。
+        </p>
+        <button class="btn-primary btn-accent" id="finalGateBtn" onclick="openFinalGate()" disabled style="opacity:0.5; cursor:not-allowed;">
+          🔒 尚未集齊 3 枚時光齒輪
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== Scene 1: 奔騰河谷與海岸防災站 ==================== -->
+    <section id="screen-stage-1" class="screen">
+      <div class="scene-header">
+        <div>
+          <h2>🌊 關卡一：奔騰河谷與海岸防災站</h2>
+          <p class="task-desc">任務：將 8 張地形特徵卡放入正確的「河段、曲流凹凸岸、海岸分類」穩流閥槽位！（課本 P.76～81／習作 P.29～31）</p>
+        </div>
+        <button class="btn-primary" style="min-height:42px; padding:6px 14px; font-size:0.9rem;" onclick="goHub()">↩ 返回關卡地圖</button>
+      </div>
+
+      <!-- 曲流放大鏡互動檢視 -->
+      <div class="panel-box">
+        <div class="panel-title">🔍 曲流放大鏡觀測儀（點擊按鈕觀察甲、乙兩岸的水流差異）</div>
+        <div class="meander-visual">
+          <div class="meander-svg-wrap">
+            <svg viewBox="0 0 320 140" width="100%" style="max-width:320px; background:#ecfeff; border-radius:12px; border:1px solid #67e8f9;">
+              <!-- 彎曲河道 -->
+              <path d="M 20,25 Q 250,25 230,75 Q 210,120 30,115" fill="none" stroke="#38bdf8" stroke-width="36" stroke-linecap="round"/>
+              <path id="svgFastArrow" d="M 80,18 Q 255,22 242,78" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="6,4" />
+              <path id="svgSlowArrow" d="M 80,35 Q 205,38 198,72" fill="none" stroke="#0f766e" stroke-width="2.5" stroke-dasharray="3,5" />
+              <!-- 凸岸砂石 -->
+              <circle cx="185" cy="58" r="14" fill="#fde68a" stroke="#ca8a04" stroke-width="2"/>
+              <text x="185" y="62" font-size="11" text-anchor="middle" font-weight="bold" fill="#78350f">甲(內側)</text>
+              <!-- 凹岸標記 -->
+              <circle cx="268" cy="58" r="15" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+              <text x="268" y="62" font-size="11" text-anchor="middle" font-weight="bold" fill="#991b1b">乙(外側)</text>
+              <text x="48" y="119" font-size="12" font-weight="bold" fill="#0c4a6e">⬅ 流往下游</text>
+            </svg>
+          </div>
+          <div class="meander-info">
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+              <button class="choice-btn" onclick="inspectMeander('convex')">🔎 檢視「甲：彎曲內側（凸岸）」</button>
+              <button class="choice-btn" onclick="inspectMeander('concave')">🔎 檢視「乙：彎曲外側（凹岸）」</button>
+            </div>
+            <div id="meanderLensText" style="background:#fff; padding:10px 12px; border-radius:10px; font-size:0.9rem; border:1px solid #bae6fd;">
+              👆 點擊上方放大鏡按鈕，觀察河道轉彎處的水流快慢與河岸變化！
+            </div>
+          </div>
+        </div>
+
+        <div class="mode-tip">💡 操作方式：可直接「按住拖曳圖卡」到下方對應槽位；在平板上也可「先點一下圖卡（變黃色），再點一下目標槽位」放入！點擊已放入的圖卡可退回待選區。</div>
+
+        <!-- 待選卡牌池 -->
+        <div class="panel-title">🃏 待校準地形與水流卡牌庫（共 8 張）</div>
+        <div class="card-pool" id="s1-pool"></div>
+      </div>
+
+      <!-- 放置槽位區 -->
+      <div class="panel-box">
+        <div class="panel-title">⚙️ 1. 河流上、中、下游穩流閥（各放 1 張）</div>
+        <div class="drop-grid" style="margin-bottom:18px;">
+          <div class="drop-zone" data-zone="up" onclick="handleZoneTap('s1', 'up')">
+            <div class="zone-label"><span>⛰️ 槽位 A：河流上游</span><small>地勢陡峭狹窄</small></div>
+            <div class="zone-items" id="s1-zone-up"></div>
+          </div>
+          <div class="drop-zone" data-zone="mid" onclick="handleZoneTap('s1', 'mid')">
+            <div class="zone-label"><span>🏞️ 槽位 B：河流中游</span><small>地勢漸低較寬</small></div>
+            <div class="zone-items" id="s1-zone-mid"></div>
+          </div>
+          <div class="drop-zone" data-zone="down" onclick="handleZoneTap('s1', 'down')">
+            <div class="zone-label"><span>🌊 槽位 C：河流下游</span><small>地勢平緩寬廣</small></div>
+            <div class="zone-items" id="s1-zone-down"></div>
+          </div>
+        </div>
+
+        <div class="panel-title">⚙️ 2. 曲流兩岸與海岸地形分類槽（曲流各 1 張、海蝕 2 張、海積 1 張）</div>
+        <div class="drop-grid">
+          <div class="drop-zone" data-zone="convex" onclick="handleZoneTap('s1', 'convex')">
+            <div class="zone-label"><span>🟡 曲流甲岸（彎曲內側）</span><small>水流較緩處</small></div>
+            <div class="zone-items" id="s1-zone-convex"></div>
+          </div>
+          <div class="drop-zone" data-zone="concave" onclick="handleZoneTap('s1', 'concave')">
+            <div class="zone-label"><span>🔴 曲流乙岸（彎曲外側）</span><small>水流較急處</small></div>
+            <div class="zone-items" id="s1-zone-concave"></div>
+          </div>
+          <div class="drop-zone" data-zone="erosion" onclick="handleZoneTap('s1', 'erosion')">
+            <div class="zone-label"><span>🪨 海蝕地形區（放 2 張）</span><small>海浪侵蝕岩體</small></div>
+            <div class="zone-items" id="s1-zone-erosion"></div>
+          </div>
+          <div class="drop-zone" data-zone="deposition" onclick="handleZoneTap('s1', 'deposition')">
+            <div class="zone-label"><span>🏖️ 海積地形區（放 1 張）</span><small>海流搬運堆積</small></div>
+            <div class="zone-items" id="s1-zone-deposition"></div>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn-primary btn-accent" onclick="checkStage1()">⚡ 啟動穩流閥（總檢核）</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Scene 2: 地底岩層與礦物實驗室 ==================== -->
+    <section id="screen-stage-2" class="screen">
+      <div class="scene-header">
+        <div>
+          <h2>💎 關卡二：地底岩層與礦物實驗室</h2>
+          <p class="task-desc">任務：完成「岩石／礦物分類」、「石英與滑石刻劃硬度實驗」與「生活應用連線」！（課本 P.85～91／習作 P.32～34）</p>
+        </div>
+        <button class="btn-primary" style="min-height:42px; padding:6px 14px; font-size:0.9rem;" onclick="goHub()">↩ 返回關卡地圖</button>
+      </div>
+
+      <!-- 任務 2-1：分類籃 -->
+      <div class="panel-box">
+        <div class="panel-title">🧺 步驟 1：分辨「岩石」與「礦物」標本（共 6 張，拖曳或點選放入籃子）</div>
+        <div class="card-pool" id="s2-pool" style="margin-bottom:14px;"></div>
+        <div class="drop-grid">
+          <div class="drop-zone" data-zone="rock" onclick="handleZoneTap('s2', 'rock')">
+            <div class="zone-label"><span>🪨 岩石標本籃（放 3 張）</span><small>由一種或多種礦物組成的集合體</small></div>
+            <div class="zone-items" id="s2-zone-rock"></div>
+          </div>
+          <div class="drop-zone" data-zone="mineral" onclick="handleZoneTap('s2', 'mineral')">
+            <div class="zone-label"><span>✨ 礦物標本籃（放 3 張）</span><small>組成岩石的單一自然物質</small></div>
+            <div class="zone-items" id="s2-zone-mineral"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 任務 2-2：礦物刻劃測試台 -->
+      <div class="panel-box">
+        <div class="panel-title">🔬 步驟 2：礦物刻劃硬度測試台（石英 vs. 滑石）</div>
+        <div class="scratch-bench">
+          <div class="mineral-box">
+            <div class="mineral-sample mineral-quartz" id="sampleQuartz">
+              <span>🤍 石英</span>
+              <small style="font-size:0.72rem; color:#475569;">表面完好</small>
+            </div>
+            <span style="font-weight:900; font-size:1.3rem;">⚡</span>
+            <div class="mineral-sample mineral-talc" id="sampleTalc">
+              <span>🩶 滑石</span>
+              <div class="scratch-mark" id="talcScratchMark"></div>
+              <small id="talcStatusText" style="font-size:0.72rem; color:#1e293b;">尚未刻劃</small>
+            </div>
+          </div>
+
+          <div style="flex:1; min-width:240px;">
+            <button class="btn-primary" id="scratchBtn" onclick="runScratchTest()" style="margin-bottom:8px;">
+              🧪 點擊開始「互相刻劃」實驗
+            </button>
+            <div id="scratchResultLog" style="font-size:0.9rem; color:#92400e; font-weight:700;">
+              請先點擊上方按鈕進行互相刻劃，觀察哪一塊礦物表面會留下凹痕與粉末！
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <p style="margin:0 0 8px 0; font-weight:700;">👉 依據刻劃結果判斷，兩者的「硬度大小」關係為何？</p>
+          <div class="choice-group" id="hardnessChoices">
+            <button class="choice-btn" onclick="selectHardness('gt', this)">石英 ＞ 滑石（石英較硬）</button>
+            <button class="choice-btn" onclick="selectHardness('eq', this)">石英 ＝ 滑石（一樣硬）</button>
+            <button class="choice-btn" onclick="selectHardness('lt', this)">滑石 ＞ 石英（滑石較硬）</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 任務 2-3：生活應用配對 -->
+      <div class="panel-box">
+        <div class="panel-title">🔗 步驟 3：岩石與礦物的生活應用配對（先點左側材料，再點右側對應物品完成連線）</div>
+        <div class="match-container">
+          <div class="match-col" id="matchLeftCol">
+            <div class="match-item" data-left="limestone" onclick="clickMatchLeft('limestone', this)">
+              <span>1. 石灰岩（主要由方解石組成）</span>
+              <span class="match-tag" id="tag-limestone">未配對</span>
+            </div>
+            <div class="match-item" data-left="granite" onclick="clickMatchLeft('granite', this)">
+              <span>2. 花崗岩（質地堅硬約7級）</span>
+              <span class="match-tag" id="tag-granite">未配對</span>
+            </div>
+            <div class="match-item" data-left="graphite" onclick="clickMatchLeft('graphite', this)">
+              <span>3. 石墨（顏色黑、硬度小）</span>
+              <span class="match-tag" id="tag-graphite">未配對</span>
+            </div>
+            <div class="match-item" data-left="sulfur" onclick="clickMatchLeft('sulfur', this)">
+              <span>4. 硫磺（黃色、容易燃燒）</span>
+              <span class="match-tag" id="tag-sulfur">未配對</span>
+            </div>
+          </div>
+
+          <div class="match-col">
+            <div class="match-item" onclick="clickMatchRight('pencil', 'ㄈ. 鉛筆筆心')">✏️ ㄈ. 鉛筆筆心</div>
+            <div class="match-item" onclick="clickMatchRight('cement', 'ㄇ. 製作水泥的主要原料')">🏗️ ㄇ. 製作水泥的主要原料</div>
+            <div class="match-item" onclick="clickMatchRight('firework', 'ㄆ. 煙火與火藥原料')">🎆 ㄆ. 煙火與火藥原料</div>
+            <div class="match-item" onclick="clickMatchRight('building', 'ㄅ. 建築牆壁與地板建材')">🏛️ ㄅ. 建築牆壁與地板建材</div>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn-primary btn-accent" onclick="checkStage2()">⚡ 確認礦物資料庫（總檢核）</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== Scene 3: 風化土壤與遠古化石區 ==================== -->
+    <section id="screen-stage-3" class="screen">
+      <div class="scene-header">
+        <div>
+          <h2>🦕 關卡三：風化土壤與遠古化石區</h2>
+          <p class="task-desc">任務：找出岩石風化原因、調配正確「土壤配方鍋」，並解讀山壁上的扇貝化石祕密！（課本 P.92～97／習作 P.35～37）</p>
+        </div>
+        <button class="btn-primary" style="min-height:42px; padding:6px 14px; font-size:0.9rem;" onclick="goHub()">↩ 返回關卡地圖</button>
+      </div>
+
+      <!-- 任務 3-1：土壤配方鍋 -->
+      <div class="panel-box">
+        <div class="panel-title">🌱 步驟 1：風化與「土壤配方鍋」拼圖（從下方選出 2 項正確的土壤組成原料放入鍋中）</div>
+        <p style="margin:0 0 10px 0; font-size:0.92rem; color:#475569;">
+          戶外的岩石長期受<strong>陽光、空氣、水、生物活動（如植物根撐開岩縫）或冷熱變化（及海邊鹽結晶蜂巢風化）</strong>影響，會碎裂成小顆粒。請問真正的「土壤」是由哪兩種關鍵物質混合而成的？（注意有干擾項喔！）
+        </p>
+
+        <div class="card-pool" id="s3-pool" style="margin-bottom:14px;"></div>
+
+        <div class="drop-zone" data-zone="soilpot" onclick="handleZoneTap('s3', 'soilpot')" style="max-width:560px; margin-bottom:14px;">
+          <div class="zone-label"><span>🍲 大地土壤配方鍋（請放入正確的 2 張成分卡）</span></div>
+          <div class="zone-items" id="s3-zone-soilpot"></div>
+        </div>
+
+        <div>
+          <label style="display:inline-flex; align-items:center; gap:10px; font-weight:800; cursor:pointer; background:#ecfdf5; padding:10px 14px; border-radius:12px; border:2px solid #6ee7b7;">
+            <input type="checkbox" id="soilFuncCheck" style="width:22px; height:22px;" />
+            <span>✅ 我確認：土壤能提供植物成長所需的養分，也是人類與許多動物生存棲息的地方！</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 任務 3-2：過港貝化石層與古環境推論 -->
+      <div class="panel-box">
+        <div class="panel-title">🐚 步驟 2：地層探祕——苗栗縣後龍溪「過港貝化石層」推論</div>
+        <p style="margin:0 0 12px 0; line-height:1.6; font-size:0.95rem;">
+          地層中的<strong>「化石」是遠古生物遺留在沉積岩中的遺骸（實體化石）或活動痕跡（生痕化石）</strong>。探險隊在現今陸地高處的山壁岩石上，發現了大量住在海裡的「扇貝化石」！請問這可以推測出什麼科學事實？
+        </p>
+        <div class="choice-group" style="flex-direction:column; align-items:stretch;">
+          <button class="choice-btn" style="text-align:left;" onclick="selectFossil('A', this)">A. 古時候這座山壁所在的位置曾經在海裡，後來地層抬升變動成為陸地山壁</button>
+          <button class="choice-btn" style="text-align:left;" onclick="selectFossil('B', this)">B. 扇貝其實是一種自然結晶生成的遠古礦物，不是生物遺骸</button>
+          <button class="choice-btn" style="text-align:left;" onclick="selectFossil('C', this)">C. 古時候的扇貝原本就長在高山的樹枝上生活</button>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn-primary btn-accent" onclick="checkStage3()">⚡ 解鎖遠古地層紀錄（總檢核）</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 最終破關挑戰：大地時光門 ==================== -->
+    <section id="screen-final" class="screen">
+      <div class="scene-header" style="border-left-color:#f59e0b;">
+        <div>
+          <h2>🚪 最終破關挑戰：啟動「大地時光門」核心</h2>
+          <p class="task-desc">恭喜集齊全部 3 枚時光齒輪！請輸入三關密碼並完成最後的防災應變認證，即可啟動返航！</p>
+        </div>
+        <button class="btn-primary" style="min-height:42px; padding:6px 14px; font-size:0.9rem;" onclick="goHub()">↩ 返回關卡地圖</button>
+      </div>
+
+      <div class="panel-box" style="text-align:center;">
+        <div class="panel-title" style="justify-content:center;">🔐 步驟 1：轉動輸入三位數「時光齒輪密碼」（依關卡一、關卡二、關卡三順序）</div>
+        <p style="margin:0; color:#475569; font-size:0.92rem;">查看螢幕下方道具匣收集到的 3 枚齒輪密碼，點擊 ▲ / ▼ 調整數字：</p>
+
+        <div class="dial-wrapper">
+          <div class="dial-unit">
+            <small>第1碼(流水)</small>
+            <button class="dial-btn" onclick="changeDial(0, 1)">▲</button>
+            <div class="dial-num" id="dial-0">0</div>
+            <button class="dial-btn" onclick="changeDial(0, -1)">▼</button>
+          </div>
+          <div class="dial-unit">
+            <small>第2碼(礦物)</small>
+            <button class="dial-btn" onclick="changeDial(1, 1)">▲</button>
+            <div class="dial-num" id="dial-1">0</div>
+            <button class="dial-btn" onclick="changeDial(1, -1)">▼</button>
+          </div>
+          <div class="dial-unit">
+            <small>第3碼(化石)</small>
+            <button class="dial-btn" onclick="changeDial(2, 1)">▲</button>
+            <div class="dial-num" id="dial-2">0</div>
+            <button class="dial-btn" onclick="changeDial(2, -1)">▼</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <div class="panel-title">🛡️ 步驟 2：時光機返航安全認證（課本 P.74～75 小土堆坡度實驗、P.82～83 防災避難）</div>
+        <p style="margin:0 0 12px 0; font-size:0.95rem; line-height:1.6;">
+          返航降落前，氣象雷達顯示山區正發布豪雨特報！根據「流水與不同坡度土堆實驗」及防災知識，下列哪一項判斷<strong>完全正確</strong>？
+        </p>
+        <div class="choice-group" style="flex-direction:column; align-items:stretch;">
+          <button class="choice-btn" style="text-align:left;" onclick="selectFinalQuiz('1', this)">
+            1. 當水量愈大且坡度愈「陡」時，流水的侵蝕與搬運作用愈強，易引發土石流；平時應做好水土保持並先查好各縣市「疏散避難地圖」與收容處所。
+          </button>
+          <button class="choice-btn" style="text-align:left;" onclick="selectFinalQuiz('2', this)">
+            2. 坡度愈陡的地方，流水侵蝕與搬運愈弱，泥沙完全不會往下移動。
+          </button>
+          <button class="choice-btn" style="text-align:left;" onclick="selectFinalQuiz('3', this)">
+            3. 颱風與豪雨完全不會改變河岸與地表形貌，不需要查詢疏散避難地圖。
+          </button>
+        </div>
+
+        <div style="text-align:center; margin-top:22px;">
+          <button class="btn-primary btn-accent" style="font-size:1.1rem; padding:14px 28px;" onclick="verifyFinalGate()">
+            🌟 開啟大地時光門！啟動返航
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. 終局通關與學習總結畫面 ==================== -->
+    <section id="screen-victory" class="screen">
+      <div class="story-banner" style="background:linear-gradient(135deg, #065f46 0%, #0369a1 100%); text-align:center; justify-content:center;">
+        <div>
+          <div style="font-size:3.2rem; margin-bottom:6px;">🏆✨🛩️✨🏆</div>
+          <h1>任務圓滿成功！榮獲「首席大地守護者證書」</h1>
+          <p>大地時光機已成功校準密碼 <strong>3 - 7 - 1</strong>，穩定翱翔在陽光普照的臺灣山海景觀上空！</p>
+        </div>
+      </div>
+
+      <h2 style="margin:18px 0 10px 0;">📚 學習成就總複習卡（單元 3：變動的大地）</h2>
+      <div class="recap-grid">
+        <div class="recap-card">
+          <h3 style="margin:0 0 8px 0; color:#0369a1;">🌊 1. 流水與海岸的力量</h3>
+          <p style="margin:0; font-size:0.92rem; line-height:1.6;">
+            • 流水具<strong>侵蝕、搬運、堆積</strong>作用；水量愈大、坡度愈陡，侵蝕搬運愈強。<br>
+            • <strong>上游</strong>流速快、多侵蝕與大石頭（V字谷/瀑布）；<strong>中游</strong>搬運明顯、多鵝卵石與曲流；<strong>下游</strong>流速慢、多堆積細泥沙（三角洲）。<br>
+            • 曲流<strong>凹岸</strong>水流快侵蝕強（後退）、<strong>凸岸</strong>水流慢堆積強（久之截斷可成牛軛湖）。<br>
+            • 海浪侵蝕成<strong>海蝕地形</strong>（海蝕平臺、海蝕溝、海蝕拱門）；搬運堆積成<strong>海積地形</strong>（沙灘、礫石灘、沙洲、潟湖）。
+          </p>
+        </div>
+
+        <div class="recap-card" style="border-top-color:#d97706;">
+          <h3 style="margin:0 0 8px 0; color:#b45309;">💎 2. 岩石、礦物與硬度</h3>
+          <p style="margin:0; font-size:0.92rem; line-height:1.6;">
+            • <strong>岩石是由一種或多種礦物組成的集合體</strong>（如花崗岩含長石、雲母、石英；石灰岩主要含方解石）。<br>
+            • 依成因分三類：<strong>火成岩</strong>（安山岩、花崗岩、玄武岩）、<strong>沉積岩</strong>（石灰岩、頁岩、砂岩）、<strong>變質岩</strong>（大理岩、板岩、片麻岩）。<br>
+            • 互相刻劃可比較硬度：留下凹痕粉末者較軟（<strong>石英硬度 ＞ 滑石</strong>）。<br>
+            • 應用：石灰岩製水泥、花崗岩作建材、板岩蓋石板屋、石英作飾品/地磚、石墨作鉛筆筆心、硫磺作火藥煙火。
+          </p>
+        </div>
+
+        <div class="recap-card" style="border-top-color:#059669;">
+          <h3 style="margin:0 0 8px 0; color:#047857;">🦕 3. 風化、土壤與化石</h3>
+          <p style="margin:0; font-size:0.92rem; line-height:1.6;">
+            • 岩石受陽光、空氣、水、生物活動或冷熱/鹽結晶（蜂巢風化）影響碎裂稱為<strong>風化作用</strong>。<br>
+            • <strong>土壤</strong>由「岩石風化碎屑」與「生物遺體腐化分解物」混合而成，提供植物養分與生物棲地。<br>
+            • <strong>化石</strong>是古生物遺留在<strong>沉積岩</strong>中的遺骸（實體化石）或活動痕跡（生痕化石），可推論古生物外形習性與古環境變遷（如山壁海貝代表曾是海洋；臺南左鎮菜寮溪陸相與海相化石見證臺灣曾與大陸陸地相連）。
+          </p>
+        </div>
+      </div>
+
+      <div class="teacher-guide">
+        <h3 style="margin:0 0 8px 0; color:#92400e;">👩‍🏫 延伸思考與教師導學互動</h3>
+        <ol style="margin:0; padding-left:20px; line-height:1.7; font-size:0.93rem;">
+          <li><strong>連結在地生活經驗</strong>：想一想，你曾在哪裡看過溪流石頭大小的變化、海岸奇岩或沙灘，或是家中有哪些岩石與礦物製品（如石英磚、鉛筆心、水泥牆）？</li>
+          <li><strong>環境守護思辨</strong>：當山坡陡峭又遇上颱風豪雨時，為什麼容易發生土石流？面對桃園藻礁、雲林外傘頂洲或野柳女王頭等地景變化，我們平時可以怎麼珍惜並保護變動的大地？</li>
+        </ol>
+      </div>
+
+      <div style="text-align:center; margin-top:22px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+        <button class="btn-primary" onclick="goHub()">🗺️ 返回關卡地圖自由複習</button>
+        <button class="btn-primary btn-accent" onclick="resetGame()">🔄 重新挑戰一次</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 底部道具匣與小嚮導岩寶對話框 Bottom Dock -->
+  <footer class="bottom-dock">
+    <div class="inventory-box">
+      <span style="font-size:0.85rem; font-weight:800; color:#cbd5e1;">⚙️ 能量線索匣：</span>
+      <div class="gear-slot" id="gear-1">🔒 齒輪1：?</div>
+      <div class="gear-slot" id="gear-2">🔒 齒輪2：?</div>
+      <div class="gear-slot" id="gear-3">🔒 齒輪3：?</div>
+    </div>
+
+    <div class="yanbao-bar">
+      <div class="yanbao-avatar" title="小嚮導岩寶">🤖</div>
+      <div class="yanbao-text" id="yanbaoSpeech">
+        嗨！我是探險小嚮導「岩寶」！請從地圖自由挑選任一關卡開始修復，集滿 3 枚時光齒輪就能開啟時光門喔！
+      </div>
+    </div>
+  </footer>
+
+  <!-- 彈窗：過關魔法卡 / 探險筆記 -->
+  <div class="modal-backdrop" id="infoModal">
+    <div class="modal-card">
+      <h3 id="modalTitle">✨ 知識魔法卡</h3>
+      <div id="modalBody" style="line-height:1.65; font-size:0.96rem; color:#334155;"></div>
+      <div style="text-align:right; margin-top:20px;" id="modalFooter">
+        <button class="btn-primary" onclick="closeModal()">太棒了！繼續探險</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==================== 音效系統 (Web Audio API 免外部音檔) ==================== */
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTone(type) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      if (type === 'tap') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'error') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.linearRampToValueAtTime(160, now + 0.25);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.28);
+      } else if (type === 'success') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+          gain.gain.setValueAtTime(0.12, now + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.09);
+          osc.stop(now + idx * 0.09 + 0.25);
+        });
+      } else if (type === 'fanfare') {
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+          gain.gain.setValueAtTime(0.15, now + idx * 0.11);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.11);
+          osc.stop(now + idx * 0.11 + 0.4);
+        });
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundToggleBtn').textContent = soundEnabled ? '🔊 音效：開' : '🔇 音效：關';
+    }
+
+    /* ==================== 遊戲核心狀態 ==================== */
+    const state = {
+      completed: { 1: false, 2: false, 3: false },
+      finalCleared: false,
+      errors: { 1: 0, 2: 0, 3: 0, final: 0 },
+      selectedCard: null, // { stage, id }
+
+      // Stage 1 卡牌資料
+      s1Cards: [
+        { id: 'c1', text: '🪨 大石頭＋水流湍急（侵蝕為主）', target: 'up', zone: null },
+        { id: 'c2', text: '🥚 鵝卵石＋河道彎曲（搬運明顯）', target: 'mid', zone: null },
+        { id: 'c3', text: '🏖️ 細泥沙＋水流緩慢（堆積為主）', target: 'down', zone: null },
+        { id: 'c4', text: '🟡 凸岸：水流較慢、堆積作用強', target: 'convex', zone: null },
+        { id: 'c5', text: '🔴 凹岸：水流較快、侵蝕作用強', target: 'concave', zone: null },
+        { id: 'c6', text: '🌉 海蝕拱門（如澎湖鯨魚洞）', target: 'erosion', zone: null },
+        { id: 'c7', text: '🌿 海蝕溝（如石門老梅綠石槽）', target: 'erosion', zone: null },
+        { id: 'c8', text: '🏝️ 沙灘與礫石灘（如墾丁／七星潭）', target: 'deposition', zone: null }
+      ],
+
+      // Stage 2 資料
+      s2Cards: [
+        { id: 'r1', text: '🪨 花崗岩（火成岩）', target: 'rock', zone: null },
+        { id: 'r2', text: '🪨 石灰岩（沉積岩）', target: 'rock', zone: null },
+        { id: 'r3', text: '🪨 板岩（變質岩）', target: 'rock', zone: null },
+        { id: 'm1', text: '💎 石英', target: 'mineral', zone: null },
+        { id: 'm2', text: '🖤 石墨', target: 'mineral', zone: null },
+        { id: 'm3', text: '💛 硫磺', target: 'mineral', zone: null }
+      ],
+      scratched: false,
+      hardnessAns: null,
+      activeLeftMatch: null,
+      matches: { limestone: null, granite: null, graphite: null, sulfur: null },
+
+      // Stage 3 資料
+      s3Cards: [
+        { id: 'p1', text: '🪨 岩石風化後的碎屑（砂、土、小石頭）', valid: true, zone: null },
+        { id: 'p2', text: '🍂 動植物遺體腐化分解後的物質', valid: true, zone: null },
+        { id: 'p3', text: '🧴 人造塑膠碎片與玻璃珠', valid: false, zone: null },
+        { id: 'p4', text: '🔥 剛噴發尚未冷卻的高溫岩漿', valid: false, zone: null }
+      ],
+      fossilAns: null,
+
+      // Final Gate 資料
+      dials: [0, 0, 0],
+      finalQuizAns: null
+    };
+
+    function sayYanbao(msg) {
+      document.getElementById('yanbaoSpeech').innerHTML = msg;
+    }
+
+    /* ==================== 畫面切換與進度更新 ==================== */
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goHub() {
+      playTone('tap');
+      state.selectedCard = null;
+      updateHubUI();
+      showScreen('screen-hub');
+      const doneCount = Object.values(state.completed).filter(Boolean).length;
+      if (doneCount < 3) {
+        sayYanbao(`目前已完成 <strong>${doneCount} / 3</strong> 個區域節點！你可以自由點選任何一個關卡前往解謎喔！`);
+      } else {
+        sayYanbao(`太厲害了！3 枚時光齒輪密碼（3、7、1）全部到齊！快點擊下方金色的「開啟大地時光門」進行最終破關吧！`);
+      }
+    }
+
+    function openStage(num) {
+      playTone('tap');
+      state.selectedCard = null;
+      showScreen(`screen-stage-${num}`);
+      if (num === 1) {
+        renderCards('s1');
+        sayYanbao('警報！河道流速和海岸標記亂了套！請把 8 張卡牌放到正確的穩流閥槽位，不確定時可以點「曲流放大鏡」觀察喔！');
+      } else if (num === 2) {
+        renderCards('s2');
+        sayYanbao('哇！這裡的岩石和礦物標籤全亂了！先分出誰是岩石、誰是礦物，再按「互相刻劃」測測看石英和滑石誰最硬吧！');
+      } else if (num === 3) {
+        renderCards('s3');
+        sayYanbao('歡迎來到遠古地層區！請選出真正組成「土壤」的 2 種原料放進鍋裡，並推理為什麼高高的山壁上會有海裡的扇貝化石！');
+      }
+    }
+
+    function openFinalGate() {
+      const doneCount = Object.values(state.completed).filter(Boolean).length;
+      if (doneCount < 3) {
+        playTone('error');
+        sayYanbao(`還不能打開時光門喔！目前尚有 ${3 - doneCount} 關未完成，請先完成所有區域節點！`);
+        return;
+      }
+      playTone('tap');
+      showScreen('screen-final');
+      sayYanbao('最後一步啦！查看下方能量線索匣的三枚齒輪密碼，轉動密碼盤並完成防災安全認證，就能啟動大地時光門！');
+    }
+
+    function updateHubUI() {
+      const doneCount = Object.values(state.completed).filter(Boolean).length;
+      document.getElementById('hudProgressText').textContent = `已修復 ${doneCount} / 3 節點`;
+      const pct = state.finalCleared ? 100 : (15 + doneCount * 25);
+      document.getElementById('energyBar').style.width = pct + '%';
+
+      // 各關卡片與底部齒輪狀態
+      const gearCodes = { 1: '流水密碼「3」', 2: '礦物密碼「7」', 3: '地層密碼「1」' };
+      const tagNames = { 1: '🌊 區域節點 A', 2: '💎 區域節點 B', 3: '🦕 區域節點 C' };
+
+      [1, 2, 3].forEach(n => {
+        const card = document.getElementById(`hub-card-${n}`);
+        const tag = document.getElementById(`hub-tag-${n}`);
+        const gear = document.getElementById(`gear-${n}`);
+        if (state.completed[n]) {
+          card.classList.add('done');
+          tag.textContent = `${tagNames[n]}｜✅ 已完成`;
+          gear.classList.add('obtained');
+          gear.textContent = `⚙️ ${gearCodes[n]}`;
+        } else {
+          card.classList.remove('done');
+          tag.textContent = `${tagNames[n]}｜未完成`;
+          gear.classList.remove('obtained');
+          gear.textContent = `🔒 齒輪${n}：?`;
+        }
+      });
+
+      // 最終破關解鎖判定
+      const gateBox = document.getElementById('finalGateHubBox');
+      const gateTitle = document.getElementById('finalGateTitle');
+      const gateStatus = document.getElementById('finalGateStatusText');
+      const gateBtn = document.getElementById('finalGateBtn');
+      const remain = 3 - doneCount;
+
+      if (remain > 0) {
+        gateBox.classList.remove('unlocked');
+        gateTitle.textContent = '🔒 最終破關挑戰：大地時光門（鎖定中）';
+        gateStatus.innerHTML = `目前尚有 <strong>${remain} 關未完成</strong>！請先自由完成上方全部 3 個關卡收集時光齒輪，才能解鎖終極時光門。`;
+        gateBtn.disabled = true;
+        gateBtn.style.opacity = '0.5';
+        gateBtn.style.cursor = 'not-allowed';
+        gateBtn.textContent = `🔒 尚有 ${remain} 關未完成`;
+      } else {
+        gateBox.classList.add('unlocked');
+        gateTitle.textContent = state.finalCleared
+          ? '🌟 最終破關挑戰：大地時光門（已成功通關！）'
+          : '🔓 最終破關挑戰：大地時光門（已解鎖！）';
+        gateStatus.innerHTML = state.finalCleared
+          ? '你已完成所有挑戰！可隨時查看學習成就總結卡或再次開啟時光門。'
+          : '太棒了！全部 3 個關卡皆已修復完畢，快帶著 3 枚時光齒輪密碼開啟大地時光門吧！';
+        gateBtn.disabled = false;
+        gateBtn.style.opacity = '1';
+        gateBtn.style.cursor = 'pointer';
+        gateBtn.textContent = state.finalCleared ? '🏆 查看通關總結與時光門' : '🚪 進入最終破關：開啟大地時光門 ➡️';
+        if (state.finalCleared) {
+          gateBtn.onclick = () => showScreen('screen-victory');
+        } else {
+          gateBtn.onclick = openFinalGate;
+        }
+      }
+    }
+
+    /* ==================== 通用拖曳 + 觸控點選放置引擎 ==================== */
+    function getStageList(stageKey) {
+      if (stageKey === 's1') return state.s1Cards;
+      if (stageKey === 's2') return state.s2Cards;
+      if (stageKey === 's3') return state.s3Cards;
+      return [];
+    }
+
+    function renderCards(stageKey) {
+      const list = getStageList(stageKey);
+      const poolEl = document.getElementById(`${stageKey}-pool`);
+      poolEl.innerHTML = '';
+
+      // 清空該關所有槽位顯示
+      document.querySelectorAll(`#screen-stage-${stageKey.slice(1)} .zone-items`).forEach(z => (z.innerHTML = ''));
+
+      list.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'drag-card';
+        if (state.selectedCard && state.selectedCard.stage === stageKey && state.selectedCard.id === item.id) {
+          el.classList.add('selected');
+        }
+        el.textContent = item.text;
+        el.draggable = true;
+
+        // 桌面拖曳事件
+        el.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', JSON.stringify({ stage: stageKey, id: item.id }));
+        });
+
+        // 平板/滑鼠點擊互動
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          playTone('tap');
+          if (item.zone !== null) {
+            // 已在槽位中 -> 點擊退回待選池
+            item.zone = null;
+            state.selectedCard = null;
+            renderCards(stageKey);
+          } else {
+            // 在待選池 -> 選取或取消選取
+            if (state.selectedCard && state.selectedCard.id === item.id) {
+              state.selectedCard = null;
+            } else {
+              state.selectedCard = { stage: stageKey, id: item.id };
+            }
+            renderCards(stageKey);
+          }
+        });
+
+        if (item.zone === null) {
+          poolEl.appendChild(el);
+        } else {
+          const targetZone = document.getElementById(`${stageKey}-zone-${item.zone}`);
+          if (targetZone) targetZone.appendChild(el);
+        }
+      });
+    }
+
+    function handleZoneTap(stageKey, zoneName) {
+      if (!state.selectedCard || state.selectedCard.stage !== stageKey) return;
+      const list = getStageList(stageKey);
+      const card = list.find(c => c.id === state.selectedCard.id);
+      if (card) {
+        playTone('tap');
+        // 單槽位限制（s1 的 up/mid/down/convex/concave/deposition 限 1 張以方便學生替換）
+        const singleZones = ['up', 'mid', 'down', 'convex', 'concave', 'deposition'];
+        if (stageKey === 's1' && singleZones.includes(zoneName)) {
+          list.forEach(c => { if (c.zone === zoneName) c.zone = null; });
+        }
+        card.zone = zoneName;
+        state.selectedCard = null;
+        clearHintGlow(stageKey);
+        renderCards(stageKey);
+      }
+    }
+
+    // 綁定 HTML5 拖放目標區事件
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.drop-zone').forEach(zoneEl => {
+        zoneEl.addEventListener('dragover', e => {
+          e.preventDefault();
+          zoneEl.classList.add('dragover');
+        });
+        zoneEl.addEventListener('dragleave', () => zoneEl.classList.remove('dragover'));
+        zoneEl.addEventListener('drop', e => {
+          e.preventDefault();
+          zoneEl.classList.remove('dragover');
+          try {
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const zoneName = zoneEl.getAttribute('data-zone');
+            const section = zoneEl.closest('section').id; // screen-stage-1
+            const stageKey = 's' + section.split('-').pop();
+            if (data.stage !== stageKey) return;
+
+            const list = getStageList(stageKey);
+            const card = list.find(c => c.id === data.id);
+            if (card) {
+              playTone('tap');
+              const singleZones = ['up', 'mid', 'down', 'convex', 'concave', 'deposition'];
+              if (stageKey === 's1' && singleZones.includes(zoneName)) {
+                list.forEach(c => { if (c.zone === zoneName) c.zone = null; });
+              }
+              card.zone = zoneName;
+              state.selectedCard = null;
+              clearHintGlow(stageKey);
+              renderCards(stageKey);
+            }
+          } catch (err) {}
+        });
+      });
+
+      // 初始化隨機洗牌各關卡片
+      state.s1Cards.sort(() => Math.random() - 0.5);
+      state.s2Cards.sort(() => Math.random() - 0.5);
+      state.s3Cards.sort(() => Math.random() - 0.5);
+      updateHubUI();
+    });
+
+    function clearHintGlow(stageKey) {
+      document.querySelectorAll(`#screen-stage-${stageKey.slice(1)} .drop-zone`).forEach(z => z.classList.remove('hint-glow'));
+    }
+
+    /* ==================== 關卡一專屬互動與檢核 ==================== */
+    function inspectMeander(side) {
+      playTone('tap');
+      const box = document.getElementById('meanderLensText');
+      if (side === 'convex') {
+        box.innerHTML = '🟡 <strong>甲岸（彎曲內側＝凸岸）</strong>：水流速度<strong>較慢</strong>，流水的<strong>堆積作用強</strong>，泥沙與礫石不斷堆積形成凸出的河岸！（課本 P.79、習作 P.30）';
+      } else {
+        box.innerHTML = '🔴 <strong>乙岸（彎曲外側＝凹岸）</strong>：水流直接衝擊、速度<strong>較快</strong>，流水的<strong>侵蝕作用強</strong>，使河岸不斷被侵蝕而往後退！（久之曲流頸截斷可能形成牛軛湖，課本 P.79）';
+      }
+    }
+
+    function checkStage1() {
+      clearHintGlow('s1');
+      const unplaced = state.s1Cards.filter(c => c.zone === null);
+      if (unplaced.length > 0) {
+        playTone('error');
+        sayYanbao(`還有 <strong>${unplaced.length} 張卡牌</strong>還沒放到穩流閥槽位喔！先把全部 8 張卡牌都放好再啟動吧！`);
+        return;
+      }
+
+      const wrongCards = state.s1Cards.filter(c => c.zone !== c.target);
+      if (wrongCards.length === 0) {
+        playTone('success');
+        state.completed[1] = true;
+        updateHubUI();
+        sayYanbao('叮咚！三個穩流閥全亮綠燈，校準成功！恭喜獲得「第一枚時光齒輪：流水密碼 3」！');
+        showModal(
+          '🌊 河海穩流徽章解鎖！獲得密碼「3」',
+          `<p><strong>🎉 穩流閥校準完成！溪水順暢流向大海，海岸也恢復秩序了！</strong></p>
+           <div style="background:#f0f9ff; border-left:4px solid #0284c7; padding:12px; border-radius:8px; margin:12px 0;">
+             <strong>✨ 流水與海岸魔法卡（課本 P.76～81）：</strong><br>
+             1. 流水有<strong>侵蝕、搬運、堆積</strong>三種作用！<br>
+             2. <strong>上游</strong>流速湍急、多侵蝕與大石頭；<strong>中游</strong>流速中等、多鵝卵石與曲流；<strong>下游</strong>流速緩慢、多堆積與細泥沙。<br>
+             3. 曲流<strong>凹岸</strong>水流快、侵蝕強（河岸後退）；<strong>凸岸</strong>水流慢、堆積強。<br>
+             4. 海浪侵蝕岩層形成<strong>海蝕地形</strong>（海蝕溝、海蝕拱門）；海流搬運堆積砂石形成<strong>海積地形</strong>（沙灘、礫石灘）！
+           </div>
+           <p style="color:#b45309; font-weight:800;">🔑 已將【第一枚時光齒輪：流水密碼 3】收入下方線索匣！</p>`,
+          true
+        );
+      } else {
+        playTone('error');
+        state.errors[1]++;
+        // 將錯誤卡牌退回待選列，保留正確卡牌！
+        wrongCards.forEach(c => {
+          const wrongZoneEl = document.querySelector(`#screen-stage-1 .drop-zone[data-zone="${c.zone}"]`);
+          if (wrongZoneEl && state.errors[1] >= 2) wrongZoneEl.classList.add('hint-glow');
+          c.zone = null;
+        });
+        renderCards('s1');
+
+        if (state.errors[1] === 1) {
+          sayYanbao(`差一點點喔！（已幫你把 ${wrongCards.length} 張放錯的卡牌退回待選區）想想看：水從高處往下流，一開始衝最快能留下什麼石頭？到了平緩下游水變慢又會堆積什麼呢？`);
+        } else {
+          sayYanbao(`🔍 放大鏡提示來囉！<strong>上游水流快留大石頭、中游是鵝卵石、下游水流慢留細泥沙</strong>；曲流<strong>外側凹岸侵蝕強、內側凸岸堆積強</strong>；海浪切斷岩石（海蝕拱門、海蝕溝）是<strong>海蝕地形</strong>，沙灘與礫石灘是<strong>海積地形</strong>喔！`);
+        }
+      }
+    }
+
+    /* ==================== 關卡二專屬互動與檢核 ==================== */
+    function runScratchTest() {
+      playTone('tap');
+      const qEl = document.getElementById('sampleQuartz');
+      const tEl = document.getElementById('sampleTalc');
+      qEl.classList.remove('rubbing');
+      tEl.classList.remove('rubbing');
+      void qEl.offsetWidth;
+      qEl.classList.add('rubbing');
+
+      setTimeout(() => {
+        state.scratched = true;
+        document.getElementById('talcScratchMark').classList.add('show');
+        document.getElementById('talcStatusText').textContent = '出現明顯凹痕與粉末！';
+        document.getElementById('talcStatusText').style.color = '#b91c1c';
+        document.getElementById('scratchResultLog').innerHTML =
+          '🔍 實驗觀察結果：<strong>石英表面完好無損（X）</strong>，而<strong>滑石表面被刻劃出一道明顯凹痕與粉末（○）</strong>！（課本 P.89／習作 P.33）';
+        sayYanbao('看清楚囉！滑石表面出現凹痕，石英卻完好無損！快在下方選出誰的硬度比較大吧！');
+      }, 650);
+    }
+
+    function selectHardness(val, btn) {
+      playTone('tap');
+      state.hardnessAns = val;
+      document.querySelectorAll('#hardnessChoices .choice-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function clickMatchLeft(key, el) {
+      playTone('tap');
+      state.activeLeftMatch = key;
+      document.querySelectorAll('#matchLeftCol .match-item').forEach(item => item.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function clickMatchRight(rightCode, labelText) {
+      if (!state.activeLeftMatch) {
+        playTone('error');
+        sayYanbao('請先點選左邊的一種「岩石或礦物」，再點選右邊的生活用品來配對喔！');
+        return;
+      }
+      playTone('tap');
+      state.matches[state.activeLeftMatch] = rightCode;
+      const tag = document.getElementById(`tag-${state.activeLeftMatch}`);
+      tag.textContent = labelText.split(' ')[0] + ' ' + labelText.split(' ')[1];
+      tag.style.background = '#059669';
+      document.querySelectorAll('#matchLeftCol .match-item').forEach(item => item.classList.remove('selected'));
+      state.activeLeftMatch = null;
+    }
+
+    function checkStage2() {
+      clearHintGlow('s2');
+      const unplaced = state.s2Cards.filter(c => c.zone === null);
+      if (unplaced.length > 0) {
+        playTone('error');
+        sayYanbao('步驟 1 還有標本卡沒放進「岩石籃」或「礦物籃」喔！');
+        return;
+      }
+      if (!state.scratched || !state.hardnessAns) {
+        playTone('error');
+        sayYanbao('別忘了完成步驟 2：先點擊「開始互相刻劃」按鈕觀察凹痕，再選出石英與滑石的硬度大小關係喔！');
+        return;
+      }
+      const unmatched = Object.values(state.matches).filter(v => v === null);
+      if (unmatched.length > 0) {
+        playTone('error');
+        sayYanbao('步驟 3 還有岩石或礦物尚未連線到生活用品喔！先點左邊再點右邊完成 4 組配對吧！');
+        return;
+      }
+
+      const wrongCards = state.s2Cards.filter(c => c.zone !== c.target);
+      const hardnessOk = state.hardnessAns === 'gt';
+      const expectedMatch = {
+        limestone: 'cement',
+        granite: 'building',
+        graphite: 'pencil',
+        sulfur: 'firework'
+      };
+      const matchOk = Object.keys(expectedMatch).every(k => state.matches[k] === expectedMatch[k]);
+
+      if (wrongCards.length === 0 && hardnessOk && matchOk) {
+        playTone('success');
+        state.completed[2] = true;
+        updateHubUI();
+        sayYanbao('能量連線完成！恭喜獲得「第二枚時光齒輪：礦物密碼 7」與岩石硬度偵測鏡！');
+        showModal(
+          '💎 岩石硬度偵測鏡解鎖！獲得密碼「7」',
+          `<p><strong>🎉 實驗室標本與硬度資料庫全數修復成功！</strong></p>
+           <div style="background:#fffbeb; border-left:4px solid #d97706; padding:12px; border-radius:8px; margin:12px 0;">
+             <strong>✨ 地底寶藏魔法卡（課本 P.85～91）：</strong><br>
+             1. <strong>岩石</strong>由一種或多種礦物組成，依成因分為<strong>火成岩（花崗岩）、沉積岩（石灰岩）、變質岩（板岩）</strong>；而石英、石墨、硫磺屬於<strong>礦物</strong>。<br>
+             2. 兩種礦物互相刻劃時，表面留下凹痕者硬度較小，因此<strong>石英硬度 ＞ 滑石</strong>（莫氏硬度中石英為 7、滑石為 1）。<br>
+             3. 生活應用：<strong>石灰岩→水泥、花崗岩→建築牆地建材、石墨→鉛筆筆心、硫磺→煙火火藥</strong>（板岩可蓋石板屋、石英可做飾品或地磚）！
+           </div>
+           <p style="color:#b45309; font-weight:800;">🔑 已將【第二枚時光齒輪：礦物密碼 7】收入下方線索匣！</p>`,
+          true
+        );
+      } else {
+        playTone('error');
+        state.errors[2]++;
+        wrongCards.forEach(c => (c.zone = null));
+        renderCards('s2');
+
+        if (state.errors[2] === 1) {
+          sayYanbao('記得喔！岩石是由礦物組成的「集合體」（名字常帶「岩」字，如花崗岩、石灰岩、板岩），而石英、石墨、硫磺是單一礦物！再檢查一下硬度比較與生活配對吧！');
+        } else {
+          sayYanbao('🔍 放大鏡提示：互相刻劃時<strong>比較軟的滑石會留凹痕，所以「石英 ＞ 滑石」</strong>！配對線索：<strong>石灰岩做水泥、花崗岩做建築牆壁地板、黑軟的石墨做鉛筆筆心、易燃的硫磺做煙火火藥</strong>！');
+        }
+      }
+    }
+
+    /* ==================== 關卡三專屬互動與檢核 ==================== */
+    function selectFossil(choice, btn) {
+      playTone('tap');
+      state.fossilAns = choice;
+      btn.parentElement.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function checkStage3() {
+      const potCards = state.s3Cards.filter(c => c.zone === 'soilpot');
+      const funcChecked = document.getElementById('soilFuncCheck').checked;
+
+      if (potCards.length === 0 || !state.fossilAns) {
+        playTone('error');
+        sayYanbao('請先把土壤成分卡放進「土壤配方鍋」、勾選土壤功能，並選出扇貝化石的正確推論喔！');
+        return;
+      }
+
+      const potOk = potCards.length === 2 && potCards.every(c => c.valid);
+      const fossilOk = state.fossilAns === 'A';
+
+      if (potOk && funcChecked && fossilOk) {
+        playTone('success');
+        state.completed[3] = true;
+        updateHubUI();
+        sayYanbao('地層斷層修復完成！恭喜獲得「第三枚時光齒輪：地層密碼 1」！');
+        showModal(
+          '🦕 古生物探測章解鎖！獲得密碼「1」',
+          `<p><strong>🎉 風化土壤與遠古化石紀錄成功修復！</strong></p>
+           <div style="background:#ecfdf5; border-left:4px solid #059669; padding:12px; border-radius:8px; margin:12px 0;">
+             <strong>✨ 風化、土壤與化石魔法卡（課本 P.92～97）：</strong><br>
+             1. 岩石受陽光、空氣、水、生物活動或冷熱影響碎裂稱為<strong>風化作用</strong>。<br>
+             2. <strong>土壤</strong>是由「岩石風化碎屑」與「生物遺體腐化分解後的物質」混合而成，能提供植物養分與動物棲息環境。<br>
+             3. <strong>化石</strong>是古生物留在<strong>沉積岩</strong>中的遺骸或活動痕跡；在山壁發現海中扇貝化石（如苗栗過港貝化石層），代表<strong>古時候這座山壁曾在海裡</strong>！
+           </div>
+           <p style="color:#b45309; font-weight:800;">🔑 已將【第三枚時光齒輪：地層密碼 1】收入下方線索匣！</p>`,
+          true
+        );
+      } else {
+        playTone('error');
+        state.errors[3]++;
+        // 退回放錯的干擾卡
+        state.s3Cards.forEach(c => {
+          if (c.zone === 'soilpot' && !c.valid) c.zone = null;
+        });
+        renderCards('s3');
+
+        if (state.errors[3] === 1) {
+          sayYanbao('別急別急！扇貝是住在海裡的生物，現在出現在高高的山壁上，代表地層經過長久的抬升變動喔！另外再檢查看看土壤鍋裡是不是集齊了 2 種天然成分並勾選了下方確認框？');
+        } else {
+          sayYanbao('🔍 直接點出線索囉：土壤鍋要放<strong>「岩石風化後的碎屑」＋「動植物遺體腐化分解後的物質」</strong>（共2張）並打勾確認框；而山壁找到海裡扇貝化石，表示<strong>A. 古時候這座山壁曾經在海裡</strong>！');
+        }
+      }
+    }
+
+    /* ==================== 最終破關挑戰：時光門密碼與總認證 ==================== */
+    function changeDial(idx, delta) {
+      playTone('tap');
+      state.dials[idx] = (state.dials[idx] + delta + 10) % 10;
+      document.getElementById(`dial-${idx}`).textContent = state.dials[idx];
+    }
+
+    function selectFinalQuiz(val, btn) {
+      playTone('tap');
+      state.finalQuizAns = val;
+      btn.parentElement.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function verifyFinalGate() {
+      const codeStr = state.dials.join('');
+      if (!state.finalQuizAns) {
+        playTone('error');
+        sayYanbao('請先回答步驟 2 的「時光機返航安全認證」問題，再點擊開啟時光門喔！');
+        return;
+      }
+
+      if (codeStr === '371' && state.finalQuizAns === '1') {
+        playTone('fanfare');
+        state.finalCleared = true;
+        updateHubUI();
+        sayYanbao('🎊 密碼 3-7-1 完全正確！大地時光門敞開了，恭喜你成為「首席大地守護者」！');
+        showScreen('screen-victory');
+      } else {
+        playTone('error');
+        state.errors.final++;
+        if (state.errors.final === 1) {
+          sayYanbao('密碼或安全認證差一點點喔！看看螢幕最下方「能量線索匣」裡的 3 枚齒輪數字，還有想想土堆愈「陡」、水量愈大時，侵蝕和搬運會變強還是變弱呢？');
+        } else {
+          sayYanbao('🔍 終極提示：三位數密碼依序是 <strong>3 - 7 - 1</strong>！而且當水量愈大、坡度愈陡時，侵蝕與搬運作用愈強（應選第 1 項）！快調整後開啟時光門吧！');
+        }
+      }
+    }
+
+    /* ==================== 探險筆記與過關彈窗 ==================== */
+    function showModal(title, htmlContent, showHubBtn = false) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = htmlContent;
+      const footer = document.getElementById('modalFooter');
+      const allDone = Object.values(state.completed).every(Boolean);
+
+      if (showHubBtn) {
+        if (allDone && !state.finalCleared) {
+          footer.innerHTML = `
+            <button class="btn-primary btn-accent" onclick="closeModal(); openFinalGate();">🚪 3關全數完成！立即前往「大地時光門」 ➡️</button>
+          `;
+        } else {
+          footer.innerHTML = `
+            <button class="btn-primary" onclick="closeModal(); goHub();">🗺️ 返回關卡地圖挑選下一關</button>
+          `;
+        }
+      } else {
+        footer.innerHTML = `<button class="btn-primary" onclick="closeModal()">關閉筆記</button>`;
+      }
+      document.getElementById('infoModal').classList.add('show');
+    }
+
+    function closeModal() {
+      playTone('tap');
+      document.getElementById('infoModal').classList.remove('show');
+    }
+
+    function openNoteModal() {
+      playTone('tap');
+      showModal(
+        '💡 探險筆記（課本 P.98～99 圖解重點整理）',
+        `<ul style="padding-left:18px; margin:0; line-height:1.7;">
+          <li><strong>流水三作用</strong>：侵蝕、搬運、堆積。坡度愈陡、水量愈大，侵蝕與搬運愈強（溝紋愈深）。</li>
+          <li><strong>河流三段</strong>：上游（水流快／侵蝕強／大石頭）→ 中游（水速中／搬運明顯／鵝卵石、曲流）→ 下游（水流慢／堆積強／細泥沙、三角洲）。</li>
+          <li><strong>曲流兩岸</strong>：<strong>凹岸</strong>水流快、侵蝕強而後退；<strong>凸岸</strong>水流慢、堆積強而淤積砂石。</li>
+          <li><strong>海岸地形</strong>：海浪侵蝕成<strong>海蝕地形</strong>（海蝕平臺、海蝕溝、海蝕拱門）；海流堆積成<strong>海積地形</strong>（沙灘、礫石灘、沙洲、潟湖）。</li>
+          <li><strong>岩石與礦物</strong>：岩石由礦物組成，分火成岩、沉積岩、變質岩。互相刻劃時，產生劃痕粉末者較軟（石英硬度 7 ＞ 滑石硬度 1）。</li>
+          <li><strong>風化、土壤與化石</strong>：岩石風化碎屑＋腐化生物遺體＝土壤；古生物遺留在沉積岩中的遺骸或活動痕跡＝化石。</li>
+        </ul>`,
+        false
+      );
+    }
+
+    function resetGame() {
+      if (!confirm('確定要重置所有闖關進度與收集到的齒輪密碼嗎？')) return;
+      playTone('tap');
+      state.completed = { 1: false, 2: false, 3: false };
+      state.finalCleared = false;
+      state.errors = { 1: 0, 2: 0, 3: 0, final: 0 };
+      state.selectedCard = null;
+      state.s1Cards.forEach(c => (c.zone = null));
+      state.s2Cards.forEach(c => (c.zone = null));
+      state.s3Cards.forEach(c => (c.zone = null));
+      state.s1Cards.sort(() => Math.random() - 0.5);
+      state.s2Cards.sort(() => Math.random() - 0.5);
+      state.s3Cards.sort(() => Math.random() - 0.5);
+
+      state.scratched = false;
+      state.hardnessAns = null;
+      document.getElementById('talcScratchMark').classList.remove('show');
+      document.getElementById('talcStatusText').textContent = '尚未刻劃';
+      document.getElementById('talcStatusText').style.color = '#1e293b';
+      document.getElementById('scratchResultLog').textContent = '請先點擊上方按鈕進行互相刻劃，觀察哪一塊礦物表面會留下凹痕與粉末！';
+
+      state.matches = { limestone: null, granite: null, graphite: null, sulfur: null };
+      ['limestone', 'granite', 'graphite', 'sulfur'].forEach(k => {
+        const t = document.getElementById(`tag-${k}`);
+        t.textContent = '未配對';
+        t.style.background = '#0284c7';
+      });
+
+      document.getElementById('soilFuncCheck').checked = false;
+      state.fossilAns = null;
+      state.dials = [0, 0, 0];
+      [0, 1, 2].forEach(i => (document.getElementById(`dial-${i}`).textContent = '0'));
+      state.finalQuizAns = null;
+      document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+
+      goHub();
+    }
+  </script>
+</body>
+</html>
